@@ -1,0 +1,58 @@
+{% extends '../home.html' %}
+{% load static %}
+{% load dict_filter %}
+
+{% block title %}Топ 25 BGG{% endblock title %}
+
+{% block css %}
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css" href={% static '/boardgames/css/style.css' %}>
+{% comment %}
+<link rel="stylesheet" type="text/css" href={% static '/boardgames/css/bgghot25.css' %}> {% endcomment %}
+{% endblock css %}
+
+{% block content %}
+<section class="bgghot25">
+    <div class="container">
+        <table class="table">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">Ранг</th>
+                    <th scope="col">Название игры</th>
+                    <th scope="col">Изображение</th>
+                    <th scope="col">Дата выпуска</th>
+                    <th scope="col">Ссылка на игру</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for item in hot25lst %}
+                <tr>
+                    <td><span class="title">{{item.rank}}</span></td>
+                    <td>
+                        {% if item.name|lower in all_db_bg_titles %}
+                        {{all_db_bg|get_ru_name:item.name}}
+                        {% else %}
+                        {{item.name}}
+                        {% endif %}
+                    </td>
+                    <td><img src={{item.thumbnail}} width="100px" alt=""></td>
+                    <td>{{item.yearpublished}}</td>
+                    <td>
+                        {% if item.name|lower in all_db_bg_titles %}
+                        <a href={{ all_db_bg|get_shop_link:item.name }}><u>Перейти на страницу товара</u></a>
+                        {% else %}
+                        <a href="https://boardgamegeek.com/boardgame/{{item.id}}/">Перейти на BGG</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block line %}{% endblock line %}

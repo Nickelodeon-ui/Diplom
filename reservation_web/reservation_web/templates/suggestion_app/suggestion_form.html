@@ -1,0 +1,271 @@
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Помощь при выборе</title>
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Andika+New+Basic:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static '/suggestion_app/css/form.css' %}">
+    <script src="{% static '/boardgames/js/jquery-3.5.1.js' %}"></script>
+    <script>
+        var data_from_user = {};
+        var counter = 1;
+
+        function send_data_to_server() {
+            var rad = document.getElementsByName('rad');
+            if (counter == 7) {
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        if (rad[i].value === "cheap") {
+                            data_from_user["price"] = "cheap";
+                        } else if (rad[i].value === "middle") {
+                            data_from_user["price"] = "middle";
+                        } else if (rad[i].value === "expensive") {
+                            data_from_user["price"] = "expensive";
+                        } else {
+                            data_from_user["price"] = "luxury";
+                        }
+                    }
+                }
+            }
+
+            data_from_user['csrfmiddlewaretoken'] = getCookie('csrftoken');
+
+            $.ajax({
+                type: 'post',
+                url: ".",
+                data: data_from_user,
+                success: function(response){
+                if (response.status == 1) {
+                    // Сообщение пользователю?  
+                    window.location = response.url;
+                } else {
+                    alert(response.message);
+                }
+              }
+            });
+        }
+
+        function getCookie(name) {
+            var cookieValue = null;
+            if (document.cookie && document.cookie != '') {
+                var cookies = document.cookie.split(';');
+                for (var i = 0; i < cookies.length; i++) {
+                    var cookie = jQuery.trim(cookies[i]);
+                    // Does this cookie string begin with the name we want?
+                    if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        question_2 = {
+            "question": "Вопрос 2: Отметьте ниже привлекательные для вас тематики",
+            "type": "checkbox",
+            "value_text": {
+                "real": "Реализм",
+                "classic": "Классические",
+                "fantasy": "Фэнтези",
+                "fantastic": "Фантастика",
+                "horror": "Ужасы"
+            },
+            "url": "https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/best-board-games-adults-1585587217.jpg"
+        }
+
+        question_3 = {
+            "question": "Вопрос 3: Вам нравятся быстрые и динамичные игры или долгие и рассудительные?",
+            "type": "radio",
+            "value_text": {
+                "<1hour": "Быстрые и динамичные",
+                ">1hour": "Долгие и рассудительные"
+            },
+            "url": "https://cdn.hswstatic.com/gif/everyday-myths-time.jpg"
+        }
+
+        question_4 = {
+            "question": "Вопрос 4: Предполагаете ли вы играть в настольную игру одному?",
+            "type": "radio",
+            "value_text": {
+                "Yes": "Да",
+                "No": "Нет"
+            },
+            "url": "https://www.happierhuman.com/wp-content/uploads/2020/05/rpg-board-games.jpg"
+        }
+
+        question_5 = {
+            "question": "Вопрос 5: Предполагаете ли вы играть в настольную игру с детьми?",
+            "type": "radio",
+            "value_text": {
+                "Yes": "Да",
+                "No": "Нет"
+            },
+            "url": "https://avatars.mds.yandex.net/get-zen_doc/1906120/pub_5e2262196d29c100ada9986c_5e22622f43863f00b137a258/scale_1200"
+        }
+
+        question_6 = {
+            "question": "Вопрос 6: Отметьте ниже привлекательные для вас механики настольных игр",
+            "type": "checkbox",
+            "value_text": {
+                "cards": "Карточная механика (в игре присутствуют карты)",
+                "dices": "Механика на кубиках (в игре активно используются кубики)",
+                "communication": "Социальная механика (основу геймплея составляет диалог)",
+                "tiles": "Механика расположения фишек (основу геймплея - фишки)",
+            },
+            "url": "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcST1i_SqTy_afl4kD_j9tdikEe4z7GAKn_v1Q&usqp=CAU"
+        }
+
+        question_7 = {
+            "question": "Вопрос 7: Укажите ценовой сегмент",
+            "type": "radio",
+            "value_text": {
+                "cheap": "Дешевые",
+                "middle": "Средний сегмент",
+                "expensive": "Дорогие",
+                "luxury": "Премиум класс"
+            },
+            "url": "https://aussiedlerbote.de/wp-content/uploads/2021/04/czeny-v-germanii.jpg"
+        }
+
+        function set_question(question_to_be_displayed) {
+            var question = document.getElementById("question");
+            var question_content = document.getElementById("question_content");
+
+            var string = "";
+            for (var key in question_to_be_displayed["value_text"]) {
+                string += `
+            <label class="rad-label">
+                <input type="${question_to_be_displayed["type"]}" class="rad-input" name="rad" value="${key}">
+                <div class="rad-design"></div>
+                <div class="rad-text">${question_to_be_displayed["value_text"][key]}</div>
+            </label>
+        `
+            };
+            question.innerHTML = question_to_be_displayed["question"];
+            question_content.innerHTML = string;
+            document.body.style.background =
+                `linear-gradient( rgba(0, 0, 0, 0.719), rgba(0, 0, 0, 0.781) ), url(${question_to_be_displayed["url"]})`;
+            document.body.style.backgroundRepeat = "no-repeat"
+            document.body.style.backgroundSize = "100%"
+        };
+
+        function process_question() {
+            var rad = document.getElementsByName('rad');
+
+            if (counter == 1) {
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        if (rad[i].value === "party") {
+                            data_from_user["party_family"] = "party";
+                        } else {
+                            data_from_user["party_family"] = "family";
+                        }
+                    }
+                }
+                set_question(question_2);
+            }
+
+            if (counter == 2) {
+                let string = ""
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        string = string + rad[i].value + ",";
+                    }
+                    data_from_user["themes"] = string.substring(0, string.length - 1);
+                }
+                set_question(question_3);
+            }
+
+            if (counter == 3) {
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        if (rad[i].value === "<1hour") {
+                            data_from_user["duration"] = "<1hour";
+                        } else {
+                            data_from_user["duration"] = ">1hour";
+                        }
+                    }
+                }
+                set_question(question_4);
+            }
+
+            if (counter == 4) {
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        if (rad[i].value === "Yes") {
+                            data_from_user["allow_one"] = "Yes";
+                        } else {
+                            data_from_user["allow_one"] ="No";
+                        }
+                    }
+                }
+                set_question(question_5);
+            }
+
+            if (counter == 5) {
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        if (rad[i].value === "Yes") {
+                            data_from_user["age_restriction"] = "Yes";
+                        } else {
+                            data_from_user["age_restriction"] = "No";
+                        }
+                    }
+                }
+                set_question(question_6);
+            }
+
+            if (counter == 6) {
+                let string = ""
+                for (var i = 0; i < rad.length; i++) {
+                    if (rad[i].checked) {
+                        string = string + rad[i].value + ",";
+                    }
+                    data_from_user["mechanics"] = string.substring(0, string.length - 1);
+                }
+                var btn = document.getElementById("btn")
+                btn.onclick = send_data_to_server
+                btn.innerText = "Подобрать настольные игры"
+                set_question(question_7);
+            }
+
+            counter++;
+            console.log(data_from_user)
+        }
+    </script>
+</head>
+
+<body>
+    <div class="question_form center">
+        <div class="question_wrapper">
+            <div class="question" id="question">
+                Вопрос 1: Вы выбираете игру для вечеринки или для домашнего развлечения?
+            </div>
+            <hr>
+            <div class="question_content" id="question_content">
+                <label class="rad-label">
+                    <input type="radio" class="rad-input" name="rad" value="party">
+                    <div class="rad-design"></div>
+                    <div class="rad-text">Предпочитаю шумную компанию</div>
+                </label>
+
+                <label class="rad-label">
+                    <input type="radio" class="rad-input" name="rad" value="family">
+                    <div class="rad-design"></div>
+                    <div class="rad-text">Предпочитаю домашнюю обстановку</div>
+                </label>
+            </div>
+            <br>
+            <button id="btn" onclick="process_question()">Следующий вопрос</button>
+        </div>
+    </div>
+</body>
+
+</html>

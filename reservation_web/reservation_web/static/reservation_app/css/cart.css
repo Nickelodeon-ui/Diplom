@@ -1,0 +1,57 @@
+.update_btn {
+    background-color: white;
+    color: black;
+}
+
+.update_btn :disabled,
+button[disabled] {
+    background-color: white;
+    color: rgba(95, 95, 95, 0.541);
+}
+
+button {
+    font-size: 16px;
+    padding: 10px 15px;
+    border: 1px solid;
+    border-radius: 4px;
+    font-family: 'Andika New Basic', sans-serif;
+    font-style: normal;
+    color: rgb(75, 60, 41);
+}
+
+.alert_inner {
+    display: flex;
+    align-items: center;
+}
+
+.button_wrapper {
+    margin-left: auto;
+}
+
+.alert_close_btn {
+    background-color: #d1e7dd;
+    border: none;
+    margin-left: auto;
+}
+
+.alert_close_btn>span {
+    font-size: 20px;
+    color: #0f5132;
+}
+
+.update_cart_set_order_wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+
+.set_order_link {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+    padding: 11px 23px;
+    border: 1px solid;
+    border-radius: 7px;
+    font-family: 'Andika New Basic', sans-serif;
+    font-style: normal;
+    color: rgb(75, 60, 41);
+}

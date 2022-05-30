@@ -1,0 +1,121 @@
+body {
+    background-image: linear-gradient( rgba(0, 0, 0, 0.719), rgba(0, 0, 0, 0.781) ), url('../img/party.jpg');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    font-family: 'Andika New Basic', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+    font-size: 1rem;
+    line-height: normal;
+    color: rgb(75, 60, 41);
+}
+
+button {
+  background-color: rgb(133, 35, 81);
+  border-radius: 8px;
+  border-style: none;
+  box-sizing: border-box;
+  color: #FFFFFF;
+  cursor: pointer;
+  display: inline-block;
+  font-family: "Haas Grot Text R Web", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  height: 40px;
+  line-height: 20px;
+  list-style: none;
+  margin: 0;
+  outline: none;
+  padding: 10px 16px;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  transition: color 100ms;
+  vertical-align: baseline;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  right: 0;
+}
+
+button:hover {
+  background-color: rgb(131, 62, 94);
+}
+
+.question_form {
+    background: rgb(255, 255, 255);
+    background-color: whitesmoke;
+    padding: 25px;
+    border: solid;
+    border-color: rgb(133, 35, 81);
+    border-radius: 10px;
+}
+
+.center {
+    margin: 0 auto;
+    width: 50%;
+    margin-top: 270px;
+  }
+
+.question {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.rad-label {
+    display: flex;
+    align-items: center;
+  
+    border-radius: 100px;
+    padding: 14px 16px;
+    margin: 5px 0;
+  
+    cursor: pointer;
+    transition: .3s;
+  }
+  
+  .rad-label:hover,
+  .rad-label:focus-within {
+    background: hsla(0, 0%, 80%, .14);
+  }
+  
+  .rad-input {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    z-index: -1;
+  }
+  
+  .rad-design {
+    width: 22px;
+    height: 22px;
+    border-radius: 100px;
+  
+    background: linear-gradient(to right bottom, hsl(345, 78%, 28%), hsl(225, 97%, 62%));
+    position: relative;
+  }
+  
+  .rad-design::before {
+    content: '';
+  
+    display: inline-block;
+    width: inherit;
+    height: inherit;
+    border-radius: inherit;
+  
+    background: hsl(0, 0%, 90%);
+    transform: scale(1.1);
+    transition: .3s;
+  }
+  
+  .rad-input:checked+.rad-design::before {
+    transform: scale(0);
+  }
+  
+  .rad-text {
+    margin-left: 14px; 
+    transition: .3s;
+  }

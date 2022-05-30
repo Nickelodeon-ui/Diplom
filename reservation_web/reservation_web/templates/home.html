@@ -1,0 +1,514 @@
+{% load static %}
+{% load dict_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %} Сдача жилых помещений в аренду {% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Andika+New+Basic:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+    {% block css %}
+    <link type="text/css" href={% static '/reservation_app/css/jquery.nice-number.css' %} rel="stylesheet">
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" type="text/css" href="{% static '/reservation_app/css/style.css' %}">
+    {% endblock css %}
+
+    {% block script %}
+    <script src="{% static '/reservation_app/js/jquery-3.5.1.js' %}"></script>
+    {{ search_form.media }}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="{% static '/reservation_app/js/hidden_forms.js' %}"></script>
+    <script src="{% static '/reservation_app/js/more_bgs_btn.js' %}"></script>
+    <script src="{% static '/reservation_app/js/jquery.nice-number.js'%}"></script>
+    <script type="text/javascript">
+        $(function () {
+    
+            $('input[type="number"]').niceNumber();
+    
+        });
+    </script>
+    <script>
+        $(document).ready(function(){
+
+            var date_range = [ ["05-04-2022", "05-10-2022"], ["11-11-2021", "11-14-2021"], ["11-21-2021", "12-02-2021"] ];
+
+            $("#id_from_date").datepicker({
+                beforeShowDay: function(date) {
+                    
+                    var string = $.datepicker.formatDate('mm-dd-yy', date);
+        
+                    for (var i = 0; i < date_range.length; i++) {
+                        
+                        if (Array.isArray(date_range[i])) {
+                            
+                            var from = new Date(date_range[i][0]);
+                            var to = new Date(date_range[i][1]);
+                            var current = new Date(string);
+                            
+                            if (current >= from && current <= to) return false;
+                        }
+                        
+                    }
+                    return [date_range.indexOf(string) == -1]
+                },
+                dateFormat: 'yy-mm-dd',
+                minDate: 0
+            });
+            $("#id_to_date").datepicker({
+                beforeShowDay: function(date) {
+                    
+                    var string = $.datepicker.formatDate('mm-dd-yy', date);
+        
+                    for (var i = 0; i < date_range.length; i++) {
+                        
+                        if (Array.isArray(date_range[i])) {
+                            
+                            var from = new Date(date_range[i][0]);
+                            var to = new Date(date_range[i][1]);
+                            var current = new Date(string);
+                            
+                            if (current >= from && current <= to) return false;
+                        }
+                        
+                    }
+                    return [date_range.indexOf(string) == -1]
+                },
+                dateFormat: 'yy-mm-dd',
+                minDate: 0
+            });
+        });
+    </script>
+    <script src="https://code.jquery.com/ui/1.13.1/jquery-ui.js"></script>
+    <script>
+        $( function() {
+          $( "#slider-range" ).slider({
+            range: true,
+            min: 0,
+            max: 2000,
+            step: 20,
+            values: [ 0, 2000 ],
+            slide: function( event, ui ) {
+              $( "#id_budget_range" ).val( "BYN " + ui.values[ 0 ] + " - BYN " + ui.values[ 1 ] );
+            }
+          });
+          $( "#id_budget_range" ).val( "BYN " + $( "#slider-range" ).slider( "values", 0 ) +
+            " - BYN " + $( "#slider-range" ).slider( "values", 1 ) );
+        } );
+        </script>
+    {% endblock script %}
+
+</head>
+
+<body>
+
+    <header class="header">
+        <div class="container">
+            <div class="header__inner">
+                <a href={% url 'reservation_app:properties_list' %} class="logo">
+                    <img src="{% static '/reservation_app/img/logo.png' %}" alt="logo" class="logo__img">
+                </a>
+
+                <div class="user_nav">
+                    {% if request.user.is_authenticated %}
+                    <a href="" class="user_nav-link">Личный кабинет</a>
+                    <a href="" class="user_nav-link">Выход</a>
+                    {% else %}
+                    <a href="" class="user_nav-link">Регистрация</a>
+                    <a href="" class="user_nav-link">Вход</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </header>
+
+    {% block search_form %}
+    {% if search_form %}
+    <section id="booking" class="section container">
+            <div class="section-center">
+				<div class="">
+					<div class="booking-form">
+						<form class="search_form" method="POST" action={% url "reservation_app:search_for_reservation"%}>
+                            {% csrf_token %}
+							<div class="search_form_inner">
+                                <div class="form_fields_left_column">
+                                    <div class="first_row" style="height: 103px; flex-grow: 1; display: flex; justify-content: space-evenly; font-weight: bold;">
+                                        <div style="flex-basis: 19%;">
+                                            <div class="form-group">
+                                                <span class="form-label">Куда вы хотите поехать?</span>
+                                                {{search_form.address}}
+                                            </div>
+                                        </div>
+                                        <div style="flex-basis: 20%;">
+                                            <div class="form-group">
+                                                <span class="form-label">Дата заезда</span>
+                                                {{search_form.from_date}}
+                                            </div>
+                                        </div>
+                                        <div style="flex-basis: 20%;">
+                                            <div class="form-group">
+                                                <span class="form-label">Дата отъезда</span>
+                                                {{search_form.to_date}}
+                                            </div>
+                                        </div>
+                                        <div style="flex-basis: 20%;">
+                                            <div class="form-group">
+                                            <p>
+                                                <span class="form-label">Ваш бюджет</span>
+                                                {{search_form.budget_range}}
+                                            </p>
+                                            <div id="slider-range"></div>
+                                            </div>
+                                        </div>
+                                       
+                                    </div>
+                                    <div class="second_row">
+                                        <div>
+                                            <div class="form-group" style="margin-bottom: 8px">
+                                                <span class="form-label"><b>Доп. информация</b></span>
+                                                <div class="dop_info_loop" style="display: flex;">
+                                                    <div style="width: 280px; margin-right: 7px" id="dop_info" class="form-control dop_info hover_click">Взрослые: 1; Дети: 0; Номера: 1</div>
+                                                    {% for field in search_form %}
+                                                        {% if field.name|startswith:'is' %}                                                            
+                                                        <div style="margin-right: 5px;">    
+                                                            {{field.help_text}}    
+                                                            {{field}}
+                                                        </div>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <section class="hidden_search_details">
+                                            <table style="width: 100%; border-collapse:separate; border-spacing:0 6px;">
+                                                <tbody>
+                                                <tr>
+                                                    <td>Взрослых</td>
+                                                    <td style="padding-left: 22px">
+                                                        {{search_form.adults_qty}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Детей</td>
+                                                    <td style="padding-left: 22px">
+                                                        {{search_form.kids_qty}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Номера</td>
+                                                    <td style="padding-left: 22px">
+                                                        {{search_form.rooms_qty}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                            </table>
+                                        </section>
+                                    </div>
+                                </div>
+								<div class="col-md-2">
+									<div class="form-btn">
+										<button class="submit-btn">Проверить доступность</button>
+									</div>
+								</div>
+							</div>
+						</form>
+                        {% for error in search_form.errors.values %}
+                        <div class="alert alert-danger" role="alert">{{error}}</div>
+                        {% endfor %}
+					</div>
+				</div>
+		</div>
+	</section>
+    {% endif %}
+    {% endblock search_form %}
+
+    {% block  content %}
+    {% comment %} <section class="suggestion_message_box">
+        <div class="suggestion_box">
+            <div class="bot_info">
+                <img src="{% static '/suggestion_app/img/bot.png' %}" width=50px alt="Фото бота Евгения">
+                <div><span class="bot_name">Евгений</span></div>
+            </div>
+            <hr>
+            <div class="suggestion_message">
+                <div>Хотите наиболее точно подобрать жильё? Мы поможем!</div>
+                <div><a style="color: white" href="{% url 'suggestion_app:get_suggestion_form' %}">Кликните на это сообщение</a></div>
+            </div>
+        </div>
+    </section> {% endcomment %}
+
+    <section class="items">
+        <div class="container">
+            {% if not properties %}
+            <div class="alert alert-danger" role="alert">
+            К сожалению по вашему запросу ничего не найдено. <a href={% url 'reservation_app:properties_list' %}><u>На главную страницу</u></a>
+            </div>
+            {% endif %}
+            
+            <div class="items__inner" id="items__inner">
+                
+                {% for property in properties %}
+                
+                <div class="property" style="display: flex; flex: ">
+                    <div id="myCarousel_{{property.id}}" class="carousel slide">                          
+                        <!-- Wrapper for slides -->
+                        <div class="carousel-inner" style="border-radius: 10px">
+                            {% for property_image in property.images.all %}
+                            
+                            {% if forloop.counter == 1 %}
+                            <div class="item active" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                            {% else %}
+                            <div class="item" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                            {% endif %}
+                                
+                            <img src="{{property_image.image.url}}" style="width: 280px; height: 230px; border: none; border-radius: 10px" alt="property_image" class="item__inner-img">
+                            </div>
+                            {% endfor %}
+                            </div>
+                        
+                            {% if property.images.all|length > 1 %}
+                            <!-- Left and right controls -->
+                            <a class="left carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="prev" style="border-radius: 10px; height: 230px;">
+                                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                <span class="sr-only">Previous</span>
+                            </a>
+                            <a class="right carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="next" style="border-radius: 10px; height: 230px;">
+                                <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                <span class="sr-only">Next</span>
+                            </a>
+                            {% endif %}
+                        </div>
+                    
+                        <div class="item__inner-content">
+                            <div class="first_row">
+                                <a href={% url 'reservation_app:property_detail' pk=property.pk %}>
+                                    <p class="item__inner-content-name">{{property.name}}</p>
+                                </a>
+                                <p class="item__inner-content-adress" style="font-size: 14px"><u>Адрес: {{property.full_address}}</u></p>
+                                <p class="item__inner-content-description">{{property.description}}</p>
+                            </div>
+                            <div class="second_row" style="display: flex; flex-basis: 100%; -ms-flex-direction: row; flex-direction: row; -ms-flex-wrap: nowrap; flex-wrap: nowrap;">
+                                <div class="left_col" style="flex: 1 1;">
+                                    <p style="font-weight: bold;">Удобства и услуги:</p>
+                                    <div class="services" style="display: flex; flex-wrap: wrap; border-left: 1px solid rgb(133, 35, 81); padding-left: 7px;">
+                                        
+                                        {% for service in property.services.all %}
+                                            <div class="services__inner " style="display: flex; margin-right: 7px; align-items: center;">
+                                                <span style="margin-right: 4px;">{{service.name}}</span>
+                                                <img src="{{service.img.url}}" style="width: 20px; height: 20px;" alt="service_image" class="item__inner-img">
+                                            </div>
+                                            {% if forloop.counter|divisibleby:"3" %}
+                                            <div style="width: 100%;"></div>
+                                            {% endif %}
+                                        {% endfor %}
+
+                                </div>
+                            </div>
+                                <div class="right_col" style="flex-shrink: 0;">
+                                    <p class="item__inner-content-price" style="font-size: 20px; font-weight: 900;">{{property.price}} BYN <span style="font-size: 14px">(сутки)</span></p>
+                                    <a href={% url 'reservation_app:property_detail' pk=property.pk %}>
+                                        <button style="width: 170px; padding: 10px; color: white; background-color: rgb(133, 35, 81);">Посмотреть <br> доступные даты</button>
+                                    </a> 
+                                </div>
+                            </div>
+                        </div> 
+                    </div>
+                {% endfor %}
+
+                <div class="items__inner" id="items__inner">
+                    {% if recommended_properties %}
+                    <div class="alert alert-info" role="alert">
+                        Рекоммендуемые системой варианты:
+                    </div>
+                    {% endif %}
+
+                    {% for property in recommended_properties %}
+                    
+                    <div class="property" style="display: flex; flex: ">
+                        <div id="myCarousel_{{property.id}}" class="carousel slide">                          
+                            <!-- Wrapper for slides -->
+                            <div class="carousel-inner" style="border-radius: 10px">
+                                {% for property_image in property.images.all %}
+                                
+                                {% if forloop.counter == 1 %}
+                                <div class="item active" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                                {% else %}
+                                <div class="item" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                                {% endif %}
+                                    
+                                <img src="{{property_image.image.url}}" style="width: 280px; height: 230px; border: none; border-radius: 10px" alt="property_image" class="item__inner-img">
+                                </div>
+                                {% endfor %}
+                                </div>
+                            
+                                {% if property.images.all|length > 1 %}
+                                <!-- Left and right controls -->
+                                <a class="left carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="prev" style="border-radius: 10px; height: 230px;">
+                                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                                    <span class="sr-only">Previous</span>
+                                </a>
+                                <a class="right carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="next" style="border-radius: 10px; height: 230px;">
+                                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                                    <span class="sr-only">Next</span>
+                                </a>
+                                {% endif %}
+                            </div>
+                        
+                            <div class="item__inner-content">
+                                <div class="first_row">
+                                    <a href={% url 'reservation_app:property_detail' pk=property.pk %}>
+                                        <p class="item__inner-content-name">{{property.name}}</p>
+                                    </a>
+                                    <p class="item__inner-content-adress" style="font-size: 14px"><u>Адрес: {{property.full_address}}</u></p>
+                                    <p class="item__inner-content-description">{{property.description}}</p>
+                                </div>
+                                <div class="second_row" style="display: flex; flex-basis: 100%; -ms-flex-direction: row; flex-direction: row; -ms-flex-wrap: nowrap; flex-wrap: nowrap;">
+                                    <div class="left_col" style="flex: 1 1;">
+                                        <p style="font-weight: bold;">Удобства и услуги:</p>
+                                        <div class="services" style="display: flex; flex-wrap: wrap; border-left: 1px solid rgb(133, 35, 81); padding-left: 7px;">
+                                            
+                                            {% for service in property.services.all %}
+                                                <div class="services__inner " style="display: flex; margin-right: 7px; align-items: center;">
+                                                    <span style="margin-right: 4px;">{{service.name}}</span>
+                                                    <img src="{{service.img.url}}" style="width: 20px; height: 20px;" alt="service_image" class="item__inner-img">
+                                                </div>
+                                                {% if forloop.counter|divisibleby:"3" %}
+                                                <div style="width: 100%;"></div>
+                                                {% endif %}
+                                            {% endfor %}
+    
+                                    </div>
+                                </div>
+                                    <div class="right_col" style="flex-shrink: 0;">
+                                        <p class="item__inner-content-price" style="font-size: 20px; font-weight: 900;">{{property.price}} BYN <span style="font-size: 14px">(сутки)</span></p>
+                                        <a href={% url 'reservation_app:property_detail' pk=property.pk %}>
+                                            <button style="width: 170px; padding: 10px; color: white; background-color: rgb(133, 35, 81);">Посмотреть <br> наличие мест</button>
+                                        </a> 
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+           
+    
+                    {% endfor %}
+            
+            </div>
+        </div>
+    </section>
+
+    {% if max_properties > 2 %}
+    <section class="buttons">
+        <div class="container">
+            <div class="button__inner">
+                <button class="more" value="More" type="more">
+                    Показать ещё
+                </button>
+            </div>
+        </div>
+    </section>
+    {% endif %}
+    {% endblock %}
+
+    {% block line %}
+    <section class="line-wrapper">
+        <div class="container">
+            <hr class="line">
+        </div>
+    </section>
+    {% endblock line %}
+
+    <section class="hidden_form">
+        <div class="container">
+            <div class="hidden_form-background"></div>
+            <form action={% url "reservation_app:properties_list" %} method="POST" class="footer__form">
+                {% csrf_token %}
+                <div class="title_and_cross_wrapper">
+                    <div class="footer_form-title">Свяжитесь с нами</div>
+                    <img src="{% static '/reservation_app/img/cross.png' %}" alt="cross" class="footer_form-img">
+                </div>
+                <div class="CustomerNameWrapper">
+                    {{review_form.customer_name.errors}}
+                    <label class=customer_name_label for="{{ form.customer_name.id_for_label }}">
+                        Ваше имя:
+                    </label>
+                    <br>
+                    {{review_form.customer_name}}
+                </div>
+                <div class="MessageWrapper">
+                    {{review_form.message.errors}}
+                    {{review_form.message.label_tag}}
+                    <br>
+                    {{review_form.message}}
+                </div>
+                <div class="footer__form-btn-wrapper">
+                    <input type="submit" value="Отправить" name="suggestion_bg" class="footer__form-btn">
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__inner">
+
+                <ul class="footer__inner-menu">
+                    <li class="footer__inner-menu-item">
+                        <a href={% url "reservation_app:about_us"%} class="footer__inner-menu-link">
+                            Наш офис
+                        </a>
+                    </li>
+                    <li class="footer__inner-menu-item">
+                        <a href="#" class="footer__inner-menu-link">
+                            FAQ
+                        </a>
+                    </li>
+                    <li class="footer__inner-menu-item">
+                        <a href="#" class="footer__inner-menu-link">
+                            Контакты
+                        </a>
+                    </li>
+                </ul>
+
+                {% comment %} {% if request.path == '/home/' %}
+                <ul class="footer__inner-download_menu">
+                    <li class="footer__inner-download_menu-item">
+                        <a href={% url 'reservation_app:download_csv' %} class="footer__inner-download_menu-link">
+                            Скачать каталог (CSV)
+                        </a>
+                    </li>
+                    <li class="footer__inner-download_menu-item">
+                        <a href={% url 'reservation_app:download_pdf' %} class="footer__inner-download_menu-link">
+                            Скачать каталог (PDF)
+                        </a>
+                    </li>
+                </ul>
+                {% endif %} {% endcomment %}
+
+                <div class="formstart">
+                    <div class="formstart__inner">
+                        <p class="formstart_message">
+                            Появились вопросы?
+                        </p>
+                        <button class="formstart_btn" value=# type=#>
+                            Свяжитесь с нами
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+
+</html>
