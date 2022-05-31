@@ -36,7 +36,7 @@ class Property(models.Model):
     rating = models.FloatField(
         "Оценка жилого помещения", null=True, blank=True)
     owner = models.ForeignKey(
-        Owner, related_name="properties", on_delete=models.CASCADE)
+        Owner, related_name="properties", on_delete=models.CASCADE, null=True, blank=True)
     # address = models.ForeignKey(Address, related_name="property", on_delete=models.SET_NULL, null=True)
     address = AddressField(on_delete=models.CASCADE)
 
@@ -73,7 +73,7 @@ class Service(models.Model):
         "Уникальный идентификатор удобсва", unique=True, db_index=True)
     img = models.ImageField("Иконка", upload_to="facility_icons/")
     name = models.CharField("Название удобсва", max_length=15)
-    is_search_service = models.BooleanField("Удобство используется при поиске?", default=False)
+    is_search_service = models.BooleanField("Удобство используется при поиске?", default=False, blank=True)
     properties = models.ManyToManyField(
         Property, verbose_name="Помещение с удобством", related_name="services", null=True, blank=True)
 
@@ -87,6 +87,9 @@ class Reservation(models.Model):
     kids_qty = models.PositiveIntegerField("Количество детей")
     adults_qty = models.PositiveIntegerField("Количество взрослых")
     resident_who_booked = models.ForeignKey(
-        Resident, verbose_name="Человек, который забронировал помещение", related_name="reservations", on_delete=models.CASCADE)
+        Resident, verbose_name="Человек, который забронировал помещение", related_name="reservations", on_delete=models.CASCADE, null=True, blank=True)
     booked_property = models.ForeignKey(
         Property, verbose_name="Забронированное помещение", related_name="reservations", on_delete=models.CASCADE)
+    price_for_booking = models.IntegerField(
+        "Плата за бронирование", default=0,
+    )

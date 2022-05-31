@@ -234,6 +234,10 @@ class PropertyDetailView(SuggestionFormMixin, DetailView):
     
     def handling_invalid_form(self, request, form):
         context={}
+        
+        if not request.user.is_authenticated:
+            context["error_user_is_not_authenticated"] = True
+
         context["search_form"] = SearchForReservationForm()
         context["review_form"] = Submit_BG_form()
         context["reservation_form"] = form
@@ -248,39 +252,40 @@ class PropertyDetailView(SuggestionFormMixin, DetailView):
         print(request.POST)
         
         form = ReservePropertyForm(request.POST)
+        property = self.get_object()
 
-        if not form.is_valid():
+        if not form.is_valid() or not request.user.is_authenticated:
             return self.handling_invalid_form(request, form)
 
-        import ipdb
-        ipdb.set_trace()
-        # Посмотреть как получать человека который бронирует
+        form.save(request, property)
 
-        form.save(request, self.get_object())
-
-        context = {
-            "property": self.get_object(),
-            "search_form": SearchForReservationForm(),
-            "review_form": Submit_BG_form(),
-            "reservation_form": ReservePropertyForm(),
+        context = self.get_context_data()
+        context.update({
+            "property": property,
             "is_booking_completed": True,
-            }
-        return reverse(request, self.template_name, context=context)
+        })
+        return render(request, self.template_name, context=context)
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        # import ipdb
-        # ipdb.set_trace()
-
+        context ={}
         context["booked_ranges"] = json.dumps(
             [[from_d.strftime("%m-%d-%Y"), to_d.strftime("%m-%d-%Y")] for from_d, to_d in self.get_object().reservations.values_list("from_date", "to_date")]
         )
-        print(context["booked_ranges"])
         context["search_form"] = SearchForReservationForm()
         context["reservation_form"] = ReservePropertyForm()
         context["review_form"] = Submit_BG_form()
         return context
+
+    def get(self, request, *args, **kwargs):
+        context = {
+            "review_form": Submit_BG_form(),
+            "property": self.get_object(),
+            "reservation_form": ReservePropertyForm(),
+            "booked_ranges": json.dumps(
+            [[from_d.strftime("%m-%d-%Y"), to_d.strftime("%m-%d-%Y")] for from_d, to_d in self.get_object().reservations.values_list("from_date", "to_date")]
+        )           
+        }
+        return render(request, self.template_name, context=context)
 
 
 # class DownloadCSVView(View):

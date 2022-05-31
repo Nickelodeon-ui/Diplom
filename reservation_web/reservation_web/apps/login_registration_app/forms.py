@@ -18,7 +18,7 @@ class OwnerOrResidentForm(UserCreationForm):
     
     phone = forms.CharField(
         max_length=20,
-        required=False,
+        required=True,
         widget=forms.TextInput(
             attrs={
                 "class": "form_input",
@@ -52,10 +52,13 @@ class OwnerOrResidentForm(UserCreationForm):
     )
 
     user_type = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={"class": "choose_field"},
+        ),
         choices=(
-            ("resident", "Аредатор"),
-            ("owner", "Арендодатель"),
-        )
+            ("resident", "Я хочу снять недвижимость"),
+            ("owner", "Я владею недвижимостью"),
+        ),
     )
 
 
@@ -80,6 +83,13 @@ class OwnerOrResidentForm(UserCreationForm):
 
 
 class MyLoginForm(AuthenticationForm):
+    error_messages = {
+        'invalid_login': (
+            "Пожалуйста, введите верные логин и пароль пользователя."
+        ),
+        'inactive': ("Этот пользователь неактивен."),
+    }
+
     username = UsernameField(
         widget=forms.TextInput(attrs={
                                'autofocus': True, "placeholder": "Пользовательское имя", "class": "form_input"})

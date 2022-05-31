@@ -1,0 +1,158 @@
+{% extends '../base.html'%}
+{% load static %}
+{% block content%}
+<link type="text/css" href={% static '/reservation_app/css/jquery.nice-number.css' %} rel="stylesheet">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="{% static '/reservation_app/css/style.css' %}"> 
+<link href="https://fonts.googleapis.com/css?family=Fredoka+One|Shadows+Into+Light&display=swap" rel="stylesheet"> 
+
+<div class="row">
+  <div class="col offset-l1 l4 offset-m1 m5 s6">
+    <div class="card-panel center" style="height: 200px;">
+      <h5 style="font-family: 'Shadows Into Light', cursive;" class='blue-text'>Забронировано жилых помещений</h5>
+      <h3 style="font-family: 'Fredoka One', cursive;">{{booked_properties.count}}</h3>
+    </div>
+  </div>
+
+  <div class="col offset-l1 l4 m5 s6">
+    <div class="card-panel center" style="height: 200px;">
+      <h5 style="font-family: 'Shadows Into Light', cursive;" class='blue-text'>Всего жилых помещений</h5>
+      <h3 style="font-family: 'Fredoka One', cursive;">{{managed_properties.count}}</h3></div>
+  </div>
+
+  <div class="center">
+    <a class="btn lighten-2" style="background-color: rgb(133, 35, 81); color: white; margin-right: 40px;" href={% url "login_registration_app:add_property" %}><b>Добавить жилое помещение</b></a>
+  </div>
+
+  <h3 style="font-family: 'Fredoka One', cursive;" class="brown-text"><b>История бронирования моих жилых помещений</b></h3>
+  {% if managed_properties %}
+  <table class="highlight bordered responsive-table">
+        <thead style="background-color: rgb(235, 205, 217); color: rgb(75, 60, 41);">
+          <tr>
+            <b>
+              <th>ID Брони</th>
+              <th>Забронированная недвижимость</th>
+              <th>Тип</th>
+              <th>Плата за аренду</th>
+              <th>Имя арендатора</th>
+              <th>Контакты арендатора</th>
+              <th>Кол-во взрослых и детей</th>
+              <th>Дата заезда</th>
+              <th>Дата отъезда</th>
+              {% comment %} <th>Изменить</th>
+              <th>Удалить</th> {% endcomment %}
+            </b>
+          </tr>
+        </thead>
+        <tbody>
+        {% for property in managed_properties %}
+          {% for reservation in property.reservations.all %}   
+          <tr>
+              <td><b>{{reservation.id}}</b></td>
+              <td><u><a href={% url 'reservation_app:property_detail' pk=property.pk %}>{{property.name}}</a></u></td>
+              <td>{{property.get_type_display}}</td>
+              <td>{{reservation.price_for_booking}} BYN</td>
+              <td>{{reservation.resident_who_booked.user.first_name}} {{reservation.resident_who_booked.user.last_name}}</td>
+              <td>{{reservation.resident_who_booked.phone}}/<br>{{reservation.resident_who_booked.user.email}}</td>
+              <td>
+                {{reservation.adults_qty}} {% if reservation.adults_qty == 1 %} взрослый {% else %} взрослых {% endif %}
+                {% if reservation.kids_qty %}
+                  и {{reservation.kids_qty}} {% if reservation.kids_qty == 1 %} ребенок {% else %} детей {% endif %}
+                {% endif %}
+              </td>
+              <td>{{reservation.from_date|date:"d-m-Y"}}</td>
+              <td>{{reservation.to_date|date:"d-m-Y"}}</td>
+              {% comment %} <td><a class="btn blue" href="">Изменить</a></td>
+              <td><a class="btn red cancel-btn" href="" id="{{property.id}}">Удалить</a></td> {% endcomment %}
+            </tr>
+            {% endfor %}
+        {% endfor %}
+        </tbody>
+      </table>
+  {% else %}
+  <div class="alert alert-info" role="alert">
+    Вашу недвижимость, к сожалению, еще не бронировали. Поэтому у вас нет доступа к списку всех броней.<br> <a href={% url 'reservation_app:properties_list' %}><u>На главную страницу</u></a>
+  </div>
+  {% endif %}
+
+</div>
+
+
+{% if not managed_properties %}
+  <div class="alert alert-danger" role="alert">
+    К сожалению по вашему запросу ничего не найдено. <a href={% url 'reservation_app:properties_list' %}><u>На главную страницу</u></a>
+  </div>
+
+{% else %}
+  <h3 style="font-family: 'Fredoka One', cursive;" class="brown-text"><b>Список моей недвижимости</b></h3>
+  <div class="items__inner" id="items__inner">
+      
+      {% for property in managed_properties %}
+      
+      <div class="property" style="display: flex;">
+          <div id="myCarousel_{{property.id}}" class="carousel slide" style="height: initial; min-width: 280px; width: 0px;">                          
+              <!-- Wrapper for slides -->
+              <div class="carousel-inner" style="border-radius: 10px">
+                  {% for property_image in property.images.all %}
+                  
+                  {% if forloop.counter == 1 %}
+                  <div class="item active" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                  {% else %}
+                  <div class="item" style="width: 280px; height: 230px; padding: 0; border: none; border-radius: 10px">
+                  {% endif %}
+                      
+                  <img src="{{property_image.image.url}}" style="width: 280px; height: 230px; border: none; border-radius: 10px" alt="property_image" class="item__inner-img">
+                  </div>
+                  {% endfor %}
+                  </div>
+              
+                  {% if property.images.all|length > 1 %}
+                  <!-- Left and right controls -->
+                  <a class="left carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="prev" style="border-radius: 10px; height: 230px;">
+                      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                      <span class="sr-only">Previous</span>
+                  </a>
+                  <a class="right carousel-control" href="#myCarousel_{{property.id}}" role="button" data-slide="next" style="border-radius: 10px; height: 230px;">
+                      <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                      <span class="sr-only">Next</span>
+                  </a>
+                  {% endif %}
+              </div>
+          
+              <div class="item__inner-content">
+                  <div class="first_row">
+                      <a href={% url 'reservation_app:property_detail' pk=property.pk %}>
+                          <p class="item__inner-content-name">{{property.name}}</p>
+                      </a>
+                      <p class="item__inner-content-adress" style="font-size: 14px"><u>Адрес: {{property.full_address}}</u></p>
+                      <p class="item__inner-content-description">{{property.description}}</p>
+                  </div>
+                  <div class="second_row" style="display: flex; flex-basis: 100%; -ms-flex-direction: row; flex-direction: row; -ms-flex-wrap: nowrap; flex-wrap: nowrap;">
+                      <div class="left_col" style="flex: 1 1;">
+                          <p style="font-weight: bold;">Удобства и услуги:</p>
+                          <div class="services" style="display: flex; flex-wrap: wrap; border-left: 1px solid rgb(133, 35, 81); padding-left: 7px;">
+                              
+                              {% for service in property.services.all %}
+                                  <div class="services__inner " style="display: flex; margin-right: 7px; align-items: center;">
+                                      <span style="margin-right: 4px;">{{service.name}}</span>
+                                      <img src="{{service.img.url}}" style="width: 20px; height: 20px;" alt="service_image" class="item__inner-img">
+                                  </div>
+                                  {% if forloop.counter|divisibleby:"3" %}
+                                  <div style="width: 100%;"></div>
+                                  {% endif %}
+                              {% endfor %}
+
+                      </div>
+                  </div>
+                      <div class="right_col" style="flex-shrink: 0;">
+                          <p class="item__inner-content-price" style="font-size: 20px; font-weight: 900;">{{property.price}} BYN <span style="font-size: 14px">(сутки)</span></p>
+                          <a class="btn blue" href={% url "login_registration_app:update_property" pk=property.id %}>Изменить</a>
+                          <a class="btn red cancel-btn" href={% url "login_registration_app:delete_property" pk=property.id %}>Удалить</a>
+                      </div>
+                  </div>
+              </div> 
+          </div>
+      {% endfor %}
+        </div>
+{% endif %}
+{% endblock %}

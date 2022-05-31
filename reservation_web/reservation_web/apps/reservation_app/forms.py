@@ -2,6 +2,7 @@
 
 from audioop import add
 import imp
+import ipaddress
 from lib2to3.pgen2.parse import ParseError
 from tkinter import Widget
 from attr import attrs
@@ -10,17 +11,32 @@ from django.test import RequestFactory
 from psycopg2 import DatabaseError
 from requests import request
 from traitlets import default
-from .models import Reservation, Property, Service
+from .models import Reservation, Property, Service, PROPERTY_TYPES_CHOICES, Image
 from django.contrib.admin.widgets import AdminDateWidget
 from datetime import datetime
 from address.forms import AddressField
 from .contsts import DATE_FORMAT
 from .utils import parse_address
 
-class AddPropertyForm(forms.ModelForm):
+class PropertyForm(forms.ModelForm):
+    images = forms.FileField(
+        widget=forms.FileInput(attrs={'multiple': True}),
+        required=False,
+    )
+
+    type = forms.ChoiceField(
+        widget=forms.Select(
+            attrs={"style": "display: block"},
+        ),
+        choices=PROPERTY_TYPES_CHOICES,
+        required=True,
+    )
+
+    address = AddressField()
+
     class Meta:
         model = Property
-        fields = ["name", "description", "type", "rooms_qty", "price"]
+        fields = ["id", "name", "description", "type", "rooms_qty", "people_capacity", "price", "address"]
 
 
 class SearchForReservationForm(forms.ModelForm):
@@ -152,8 +168,9 @@ class ReservePropertyForm(forms.ModelForm):
             to_date=parsed_to_date,
             kids_qty=self.data["kids_qty"],
             adults_qty=self.data["adults_qty"],
-            resident_who_booked=request.user,
+            resident_who_booked=getattr(request.user, "resident", None) or request.user.owner,
             booked_property=property,
+            price_for_booking=(property.price * (parsed_to_date-parsed_from_date).days) + 10,
         )
         return reservation
 

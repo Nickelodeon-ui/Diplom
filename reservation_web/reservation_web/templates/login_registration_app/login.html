@@ -1,0 +1,22 @@
+{% extends "./registration.html" %}
+
+{% block page_title %}<title>Вход в аккаунт</title>{% endblock page_title %}
+
+{% block form %}
+<form action={% url "login_registration_app:login" %} method="post">
+    <p class="form_title">ВОЙДИТЕ В АККАУНТ</p>
+    {% csrf_token %}
+    {% for error in form.errors.values %}
+    <div style="width: 450px;" class="alert alert-danger" role="alert">{{error}}</div>
+    {% endfor %}
+    {% for field in form %}
+    {{field}}
+    <br>
+    {% endfor %}
+    <input type="submit" value="Вход" id="enter_btn">
+    <br>
+    <div class="to_register_wrapper">
+        Ещё нет аккаунта?<a href={% url "login_registration_app:register" %} class="login"> <b><u>Нажмите сюда</u></b></a>
+    </div>
+</form>
+{% endblock form %}

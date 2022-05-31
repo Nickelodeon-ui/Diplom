@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    {% block page_title %}<title>Регистрация пользователя</title>{% endblock page_title %}
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static '/reservation_app/css/style.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static '/reservation_app/css/registration_login.css' %}">
+</head>
+
+<body>
+    <div class="container">
+        <div class="registration_form_wrapper">
+            {% block form %}
+            <form action={% url 'login_registration_app:register' %} method="post">
+                <p class="form_title">СОЗДАЙТЕ АККАУНТ</p>
+                {% csrf_token %}
+                {% for error in form.errors.values %}
+                    <div style="max-width: 450px" class="alert alert-danger" role="alert">{{error}}</div>
+                {% endfor %}
+                {% for field in form %}
+                {{field}}
+                <br>
+                {% endfor %}
+                <input type="submit" value="Регистрация" class="submit_btn">
+                <br>
+                <div class="to_login_wrapper">
+                    Уже есть аккаунт?<a href={% url 'login_registration_app:login' %} class="login"> <b><u>Нажмите сюда</u></b></a>
+                </div>
+            </form>
+            {% endblock form %}
+        </div>
+
+    </div>
+</body>
+
+</html>

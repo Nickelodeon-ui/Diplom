@@ -1,0 +1,93 @@
+{% extends '../base.html'%}
+
+{% block content %}
+<link
+href="https://fonts.googleapis.com/css2?family=Andika+New+Basic:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com">
+{{ property_form.media }}
+
+<div class="row">
+  <div class="col l8 offset-l2 m10 offset-m1 s12">
+  <div class="card-panel">
+  <br>
+  <div class="row">
+  {% if property_id %}
+  <form class="col s12" method="POST" action="/account/update-property/{{property_id}}" enctype="multipart/form-data">
+  {% else %}
+  <form class="col s12" method="POST" action={% url "login_registration_app:add_property" %} enctype="multipart/form-data">
+  {% endif %}
+    {% csrf_token %}
+    
+    <div class="row">
+      <div class="input-field col s12">  
+        {{property_form.name}}
+        <label for="id_name">Название недвижимости</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s12">  
+        {{property_form.address}}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s12">  
+        {{property_form.description}}
+        <label style="margin-left: 5px;" for="id_description">Описание недвижимости</label>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col s12">
+        <label for="id_type">Тип недвижимости</label>
+        {{property_form.type}}
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="input-field col s12">  
+        {{property_form.price}}
+        <label for="id_price">Цена (ночь)</label>
+      </div>
+    </div>   
+      
+  <div class="row">
+      <div class="file-field input-field col s12">
+        <div class="btn red lighten-2">
+          <span><i class="material-icons left black-text text-lighten-1">image</i> Фото</span>
+          {{property_form.images}}
+        </div>
+        <div class="file-path-wrapper">
+          <input class="file-path validate" type="text">
+        </div>
+      </div>
+    </div>
+
+   <div class="row">
+    <div class="input-field col s12">  
+      {{property_form.rooms_qty}}
+      <label for="id_rooms_qty">Количество комнат/номеров</label>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="input-field col s12">  
+      {{property_form.people_capacity}}
+      <label for="id_people_capacity">Вместимость недвижимости (чел)</label>
+    </div>
+  </div>
+     
+    <div class="center">
+      <input type="submit" style="background-color: rgb(133, 35, 81); color: white;" class="btn btn-large" value={% if property_id %} "Обновить недвижимость" {% else %} "Добавить недвижимость" {%endif%}>
+    </div>
+    
+  </form>
+</div>
+</div>
+</div>
+</div>
+
+
+{% endblock %}

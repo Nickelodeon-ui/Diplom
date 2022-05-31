@@ -122,12 +122,12 @@
 
                 <div class="user_nav">
                     {% if request.user.is_authenticated %}
-                    <a href="" class="user_nav-link">Личный кабинет</a>
-                    <a href="" class="user_nav-link">Выход</a>
+                        <a href={% url "login_registration_app:user_profile" %} class="user_nav-link">Личный кабинет</a>
+                        <a href={% url "login_registration_app:logout" %} class="user_nav-link">Выход</a>
                     {% else %}
-                    <a href="" class="user_nav-link">Регистрация</a>
-                    <a href="" class="user_nav-link">Вход</a>
-                    {% endif %}
+                        <a href={% url "login_registration_app:register" %} class="user_nav-link">Регистрация</a>
+                        <a href={% url "login_registration_app:login" %} class="user_nav-link">Вход</a>
+                     {% endif %} 
                 </div>
             </div>
         </div>
@@ -233,7 +233,7 @@
     {% endif %}
     {% endblock search_form %}
 
-    {% block  content %}
+    {% comment %} {% block  content %} {% endcomment %}
     {% comment %} <section class="suggestion_message_box">
         <div class="suggestion_box">
             <div class="bot_info">
@@ -260,7 +260,7 @@
                 
                 {% for property in properties %}
                 
-                <div class="property" style="display: flex; flex: ">
+                <div class="property" style="display: flex;">
                     <div id="myCarousel_{{property.id}}" class="carousel slide">                          
                         <!-- Wrapper for slides -->
                         <div class="carousel-inner" style="border-radius: 10px">
@@ -407,7 +407,7 @@
         </div>
     </section>
 
-    {% if max_properties > 2 %}
+    {% comment %} {% if max_properties > 2 %}
     <section class="buttons">
         <div class="container">
             <div class="button__inner">
@@ -418,7 +418,7 @@
         </div>
     </section>
     {% endif %}
-    {% endblock %}
+    {% endblock %} {% endcomment %}
 
     {% block line %}
     <section class="line-wrapper">
@@ -500,7 +500,7 @@
                         <p class="formstart_message">
                             Появились вопросы?
                         </p>
-                        <button class="formstart_btn" value=# type=#>
+                        <button class="formstart_btn">
                             Свяжитесь с нами
                         </button>
                     </div>

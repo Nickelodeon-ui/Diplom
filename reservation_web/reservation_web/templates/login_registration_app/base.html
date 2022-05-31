@@ -1,0 +1,112 @@
+{%load static %}
+ <!DOCTYPE html>
+  <html>
+    <head>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+      <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+      <!--Import Google Icon Font-->
+      
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css?family=Cookie&display=swap" rel="stylesheet"> 
+        <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.min.css'>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js'></script>
+     <!--Let browser know website is optimized for mobile-->
+     <script src="{% static '/reservation_app/js/jquery-3.5.1.js' %}"></script>
+     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+     
+
+<link type="text/css" href={% static '/reservation_app/css/jquery.nice-number.css' %} rel="stylesheet">
+<link rel="stylesheet" href="//code.jquery.com/ui/1.13.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" type="text/css" href="{% static '/reservation_app/css/style.css' %}"> 
+<script src="{% static '/reservation_app/js/hidden_forms.js' %}"></script>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </head>
+    <body>
+      <header class="header">
+        <div class="container">
+            <div class="header__inner">
+                <a href={% url 'reservation_app:properties_list' %} class="logo">
+                    <img src="{% static '/reservation_app/img/logo.png' %}" alt="logo" class="logo__img">
+                </a>
+
+                <div class="user_nav">
+                    {% if request.user.is_authenticated %}
+                        <a href={% url "login_registration_app:user_profile" %} class="user_nav-link">Личный кабинет</a>
+                        <a href={% url "login_registration_app:logout" %} class="user_nav-link">Выход</a>
+                    {% else %}
+                        <a href={% url "login_registration_app:register" %} class="user_nav-link">Регистрация</a>
+                        <a href={% url "login_registration_app:login" %} class="user_nav-link">Вход</a>
+                     {% endif %} 
+                </div>
+            </div>
+        </div>
+    </header>
+
+<div class="container" style="margin-bottom: 30px;">
+  {% block content %}
+  {%endblock %}
+</div>
+
+<section class="hidden_form">
+  <div class="container">
+      <div class="hidden_form-background"></div>
+      <form action={% url "reservation_app:properties_list" %} method="POST" class="footer__form">
+          {% csrf_token %}
+          <div class="title_and_cross_wrapper">
+              <div class="footer_form-title">Свяжитесь с нами</div>
+              <img src="{% static '/reservation_app/img/cross.png' %}" alt="cross" class="footer_form-img">
+          </div>
+          <div class="CustomerNameWrapper">
+              {{review_form.customer_name.errors}}
+              <label class=customer_name_label for="{{ form.customer_name.id_for_label }}">
+                  Ваше имя:
+              </label>
+              <br>
+              <div style="width: 472px;">
+              {{review_form.customer_name}}
+            </div>
+          </div>
+          <div class="MessageWrapper">
+              {{review_form.message.errors}}
+              {{review_form.message.label_tag}}
+              <br>
+              {{review_form.message}}
+          </div>
+          <div class="footer__form-btn-wrapper">
+              <input type="submit" value="Отправить" name="suggestion_bg" class="footer__form-btn">
+          </div>
+      </form>
+  </div>
+</section>
+
+    <footer class="page-footer" style="color: rgb(75, 60, 41); background-color: rgb(235, 205, 217)">
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 style="font-family: 'Cookie';"><b>Urban home realestate</b></h5>
+            <p class="text-lighten-4">Бронируйте любые жилые помещения по выгодным предложениям</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 style="font-family:'Times New Roman'"><b>Важные ссылки</b></h5>
+            <ul>
+              <li style="margin-bottom: 4px;"><a href={% url 'reservation_app:properties_list' %}>Домашняя страница</a></li>
+              <li style="margin-bottom: 4px;"><a href="/">FAQ</a></li>
+              <li style="margin-bottom: 4px;"><a href={% url "reservation_app:about_us"%}>Наш офис</a></li>
+              <li class="formstart_btn" style="margin-bottom: 4px;">Свяжитесь с нами</li>
+              {% comment %} <li><a class="grey-text text-lighten-3" href="{% url 'export' %}" class="export">
+                        Download Room catalog (CSV) 
+                    </a> {% endcomment %}
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div style="color: rgb(75, 60, 41)" class="container">
+        © 2022 All right reserved
+        </div>
+      </div>
+    </footer>
+    </body>
+  </html>
